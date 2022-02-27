@@ -9,7 +9,6 @@ import pino from 'pino'
 import { getNodeRequest, NodeRequest, sendNodeResponse } from './http-utils'
 import {
   YogaServer,
-  YogaInitialContext,
   GraphQLYogaError,
   YogaServerOptions,
 } from '@graphql-yoga/common'
@@ -23,9 +22,13 @@ import { ExecutionResult, print } from 'graphql'
 import 'pino-pretty'
 import { platform } from 'os'
 
-function getPinoLogger<TContext, TRootValue>(
-  options: YogaNodeServerOptions<TContext, TRootValue>['logging'] = {},
-): YogaServerOptions<TContext, TRootValue>['logging'] {
+function getPinoLogger<TServerContext, TUserContext, TRootValue>(
+  options: YogaNodeServerOptions<
+    TServerContext,
+    TUserContext,
+    TRootValue
+  >['logging'] = {},
+): YogaServerOptions<TServerContext, TUserContext, TRootValue>['logging'] {
   if (options === false) {
     return false
   }
@@ -62,9 +65,10 @@ function getPinoLogger<TContext, TRootValue>(
 }
 
 class YogaNodeServer<
-  TAdditionalContext extends Record<string, any>,
+  TServerContext extends Record<string, any>,
+  TUserContext extends Record<string, any>,
   TRootValue,
-> extends YogaServer<TAdditionalContext, TRootValue> {
+> extends YogaServer<TServerContext, TUserContext, TRootValue> {
   /**
    * Address Information for Server
    */
@@ -72,7 +76,11 @@ class YogaNodeServer<
   private nodeServer: NodeServer | null = null
 
   constructor(
-    private options?: YogaNodeServerOptions<TAdditionalContext, TRootValue>,
+    private options?: YogaNodeServerOptions<
+      TServerContext,
+      TUserContext,
+      TRootValue
+    >,
   ) {
     super({
       ...options,
@@ -109,12 +117,12 @@ class YogaNodeServer<
 
   async handleIncomingMessage(
     nodeRequest: NodeRequest,
-    additionalContext?: TAdditionalContext,
+    serverContext?: TServerContext,
   ): Promise<Response> {
     this.logger.debug(`Node Request received`)
     const request = await getNodeRequest(nodeRequest, this.addressInfo)
     this.logger.debug('Node Request processed')
-    const response = await this.handleRequest(request, additionalContext)
+    const response = await this.handleRequest(request, serverContext)
     this.logger.debug('Response returned')
     return response
   }
@@ -238,13 +246,14 @@ class YogaNodeServer<
  * ```
  */
 export function createServer<
-  TAdditionalContext extends Record<string, any> = {
+  TServerContext extends Record<string, any> = {
     req: IncomingMessage
     res: ServerResponse
   },
+  TUserContext extends Record<string, any> = {},
   TRootValue = {},
->(options?: YogaNodeServerOptions<TAdditionalContext, TRootValue>) {
-  return new YogaNodeServer<TAdditionalContext, TRootValue>(options)
+>(options?: YogaNodeServerOptions<TServerContext, TUserContext, TRootValue>) {
+  return new YogaNodeServer<TServerContext, TUserContext, TRootValue>(options)
 }
 
 export {
