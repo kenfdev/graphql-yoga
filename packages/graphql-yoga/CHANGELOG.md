@@ -1,5 +1,12 @@
 # graphql-yoga
 
+## 2.0.0-beta.5
+
+### Patch Changes
+
+- Updated dependencies [cfec14b]
+  - @graphql-yoga/node@0.1.0-beta.5
+
 ## 2.0.0-beta.4
 
 ### Patch Changes

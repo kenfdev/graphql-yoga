@@ -1,5 +1,12 @@
 # koa-example
 
+## 0.0.1-beta.2
+
+### Patch Changes
+
+- Updated dependencies [cfec14b]
+  - @graphql-yoga/node@0.1.0-beta.5
+
 ## 0.0.1-beta.1
 
 ### Patch Changes

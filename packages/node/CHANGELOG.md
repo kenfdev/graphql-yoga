@@ -1,5 +1,11 @@
 # @graphql-yoga/node
 
+## 0.1.0-beta.5
+
+### Minor Changes
+
+- cfec14b: enhance(node): get address info from the socket connection if possible
+
 ## 0.1.0-beta.4
 
 ### Minor Changes
